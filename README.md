@@ -1,105 +1,74 @@
+# Angular + Nest Example
 
+Angular、NestJSを使用したサンプル画面です。  
+DBはPostgreSQLを使用しています。  
+最低限の構成で、簡単なCRUD機能を実現しています。  
 
-# AngularNestExample
+## 動作確認環境
 
-This project was generated using [Nx](https://nx.dev).
+・node.js       16.12.0  
+・npm           8.1.0  
+・PostgreSql    12.1
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
+## インストール方法
+ npm install で必要なモジュールをインストールします。  
+ DBは、PostgreSqlを適当にインストールし、テスト用のテーブル、初期ユーザを作成してください。
 
-🔎 **Smart, Extensible Build Framework**
+・DB設定（server/src/config/common.ts）
+```
+user = 'postgres';
+password = 'postgres';
+host = 'localhost';
+port = 5432;
+database = 'postgres';
+```
 
-## Quick Start & Documentation
+・テスト用のテーブル、初期ユーザ作成
+```
+# CREATE TABLE users (id serial, name varchar(50), age int, sex int, birthday timestamptz, password varchar(128), note varchar(256));
+# CREATE TABLE room_access_mng (id serial, room_cd varchar(10), user_id int, entry_dt timestamptz, exit_dt timestamptz, note varchar(256));
+# INSERT INTO users (name, password, note) VALUES ('admin', 'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413', 'password:123456');
+```
 
-[Nx Documentation](https://nx.dev/angular)
+## ビルド＆起動方法
 
-[10-minute video showing all Nx features](https://nx.dev/getting-started/intro)
+・ビルド
+```
+$ npm run build
+```
 
-[Interactive Tutorial](https://nx.dev/tutorial/01-create-application)
+・起動
 
-## Adding capabilities to your workspace
+```
+$ npm start
+```
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+・起動（開発用、ソースの変更監視）
+```
+$ npm run watch
+```
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+※ VSCodeでデバッグする場合、「Attach Node」でnodeのプロセス（`・・・/ts-node ./src/bin/www.ts`）にアタッチしてください。
 
-Below are our core plugins:
+## herokuでの実行
 
-- [Angular](https://angular.io)
-  - `ng add @nrwl/angular`
-- [React](https://reactjs.org)
-  - `ng add @nrwl/react`
-- Web (no framework frontends)
-  - `ng add @nrwl/web`
-- [Nest](https://nestjs.com)
-  - `ng add @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `ng add @nrwl/express`
-- [Node](https://nodejs.org)
-  - `ng add @nrwl/node`
+以下の設定が必要です。
 
-There are also many [community plugins](https://nx.dev/community) you could add.
+・devDependenciesのmoduleもインストールする。
+```
+heroku config:set NPM_CONFIG_PRODUCTION=false --app XXXXXXXXXXXX
+```
 
-## Generate an application
+・DBの設定を変更する
+```
+heroku config:set DB_USER=XXXXXXXXXX --app XXXXXXXXXXXX
+heroku config:set DB_PASSWORD=XXXXXXXXXX --app XXXXXXXXXXXX
+heroku config:set DB_HOST=XXXXXXXXXX --app XXXXXXXXXXXX
+heroku config:set DB_PORT=XXXXXXXXXX --app XXXXXXXXXXXX
+heroku config:set DB_NAME=XXXXXXXXXX --app XXXXXXXXXXXX
+```
 
-Run `ng g @nrwl/angular:app my-app` to generate an application.
-
-> You can use any of the plugins above to generate applications as well.
-
-When using Nx, you can create multiple applications and libraries in the same workspace.
-
-## Generate a library
-
-Run `ng g @nrwl/angular:lib my-lib` to generate a library.
-
-> You can also use any of the plugins above to generate libraries as well.
-
-Libraries are shareable across libraries and applications. They can be imported from `@angular-nest-example/mylib`.
-
-## Development server
-
-Run `ng serve my-app` for a dev server. Navigate to http://localhost:4200/. The app will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng g component my-component --project=my-app` to generate a new component.
-
-## Build
-
-Run `ng build my-app` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test my-app` to execute the unit tests via [Jest](https://jestjs.io).
-
-Run `nx affected:test` to execute the unit tests affected by a change.
-
-## Running end-to-end tests
-
-Run `ng e2e my-app` to execute the end-to-end tests via [Cypress](https://www.cypress.io).
-
-Run `nx affected:e2e` to execute the end-to-end tests affected by a change.
-
-## Understand your workspace
-
-Run `nx dep-graph` to see a diagram of the dependencies of your projects.
-
-## Further help
-
-Visit the [Nx Documentation](https://nx.dev/angular) to learn more.
-
-
-
-
-
-
-## ☁ Nx Cloud
-
-### Distributed Computation Caching & Distributed Task Execution
-
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-cloud-card.png"></p>
-
-Nx Cloud pairs with Nx in order to enable you to build and test code more rapidly, by up to 10 times. Even teams that are new to Nx can connect to Nx Cloud and start saving time instantly.
-
-Teams using Nx gain the advantage of building full-stack applications with their preferred framework alongside Nx’s advanced code generation and project dependency graph, plus a unified experience for both frontend and backend developers.
-
-Visit [Nx Cloud](https://nx.app/) to learn more.
+・タイムゾーンの設定
+```
+# alter database XXXXXXXXXX set timezone = 'Asia/Tokyo';
+```
