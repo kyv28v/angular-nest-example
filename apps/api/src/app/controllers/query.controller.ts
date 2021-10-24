@@ -1,6 +1,10 @@
-import { Controller, Get, Post, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Query, Request, Res, Body, HttpStatus, HttpException } from '@nestjs/common';
+import { Response } from 'express';
 import { QueryResult } from '@angular-nest-example/api-interfaces';
 import { DatabaseService } from '../services/database.service';
+import { AuthService } from '../services/auth.service';
+
+const jwt = require('jsonwebtoken');
 
 const fs = require('fs')
 
@@ -8,17 +12,28 @@ const fs = require('fs')
 export class QueryController {
   constructor(
     private readonly db: DatabaseService,
+    private readonly auth: AuthService,
   ) {}
 
 
   @Get('query')
   async getQuery(
+    @Request() req: Request,
+    @Res() res: Response,
     @Query() query: any,
-  ): Promise<QueryResult> {
+  ) {
     try {
       console.log('getQuery(' + JSON.stringify(query) + ')');
-      console.log('sql:' + query.sql);
-      console.log('values:' + query.values);
+      console.log(' sql:' + query.sql);
+      console.log(' values:' + query.values);
+
+      // トークンの正常チェック
+      const verifyToken = await this.auth.verifyToken(req.headers['access-token']);
+      if(verifyToken) {
+        res.status(HttpStatus.UNAUTHORIZED);
+        res.json({message: verifyToken});
+        return;
+      }
 
       const sql = fs.readFileSync('./apps/api/src/assets/sqls/' + query.sql, 'utf-8');
       console.log(sql);
@@ -27,23 +42,35 @@ export class QueryController {
       const values = JSON.parse(query.values + '');
       const data = await this.query(sql, values, false);
 
-      console.log('db.get() end');
-      console.log('data:' + JSON.stringify(data.rows));
-      return { rows: data.rows, message: null };
+      console.log('getQuery() end');
+      console.log(' data:' + JSON.stringify(data.rows));
+      res.json({rows: data.rows, message: null});
+      return;
     } catch (e) {
       console.error(e.stack);
-      return { rows: null, message: e.message };
+      res.json({rows: null, message: e.message});
+      return;
     }
   }
 
   @Post('query')
   async postQuery(
+    @Request() req: Request,
+    @Res() res: Response,
     @Body() body: any,
-  ): Promise<QueryResult> {
+  ) {
     try {
       console.log('postQuery(' + JSON.stringify(body) + ')');
-      console.log('sql:' + body.sql);
-      console.log('values:' + body.values);
+      console.log(' sql:' + body.sql);
+      console.log(' values:' + body.values);
+
+      // トークンの正常チェック
+      const verifyToken = await this.auth.verifyToken(req.headers['access-token']);
+      if(verifyToken) {
+        res.status(HttpStatus.UNAUTHORIZED);
+        res.json({message: verifyToken});
+        return;
+      }
 
       const sql = fs.readFileSync('./apps/api/src/assets/sqls/' + body.sql, 'utf-8');
       console.log(sql);
@@ -51,22 +78,22 @@ export class QueryController {
       // SQL実行
       const data = await this.query(sql, body.values, true);
 
-      console.log('db.post() end');
-      console.log('data:' + JSON.stringify(data.rows));
-      return { rows: data.rows, message: null };
+      console.log('postQuery() end');
+      console.log(' data:' + JSON.stringify(data.rows));
+      res.json({rows: data.rows, message: null});
+      return;
     } catch (e) {
       console.error(e.stack);
-      return { rows: null, message: e.message };
+      res.json({rows: null, message: e.message});
+      return;
     }
-
-
   }
 
   async query(sql: string, values: any[], trans: boolean) {
     try {
-      console.log('db.query() start');
-      console.log('sql:' + sql);
-      console.log('values:' + JSON.stringify(values));
+      // console.log('db.query() start');
+      // console.log('sql:' + sql);
+      // console.log('values:' + JSON.stringify(values));
 
       // DB接続
       await this.db.connect();
@@ -76,8 +103,8 @@ export class QueryController {
       const data = await this.db.query(sql, values);
       if (trans) { await this.db.commit(); }
 
-      console.log('db.query() end');
-      console.log('data:' + JSON.stringify(data.rows));
+      // console.log('db.query() end');
+      // console.log('data:' + JSON.stringify(data.rows));
       return data;
     } catch (e) {
       if (trans) { await this.db.rollback(); }
