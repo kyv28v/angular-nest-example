@@ -43,12 +43,8 @@ $ npm run build
 $ npm start
 ```
 
-・起動（開発用、ソースの変更監視）
-```
-$ npm run watch
-```
-
-※ VSCodeでデバッグする場合、「Attach Node」でnodeのプロセス（`・・・/ts-node ./src/bin/www.ts`）にアタッチしてください。
+※ 「Launch Chrome」で Chrome が起動します。これでフロントエンドのデバッグができます。  
+※ バックエンドのデバッグがしたい場合、「Attach Node」でnodeのプロセスにアタッチしてください。
 
 ## herokuでの実行
 
