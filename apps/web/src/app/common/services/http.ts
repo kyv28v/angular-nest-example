@@ -63,6 +63,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
       // リクエスト実行。成功なら、応答データをそのまま返す。
       const refresh: any = await this.http.post('api/refreshToken', null, { headers: refreshHeaders }).toPromise();
       // console.log('refreshToken http response:' + JSON.stringify(refresh));
+      if (refresh.message) {
+        alert(refresh.message);
+        return;
+      }
       localStorage.setItem('accessToken', refresh.accessToken);
       return true;
     } catch (e) {
