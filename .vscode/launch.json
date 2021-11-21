@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach",
+            "name": "Attach Node",
             "port": 9229,
             "request": "attach",
             "skipFiles": [
@@ -16,7 +16,7 @@
         {
             "type": "pwa-chrome",
             "request": "launch",
-            "name": "Launch Chrome against localhost",
+            "name": "Launch Chrome",
             "url": "http://localhost:4200",
             "webRoot": "${workspaceFolder}"
         }
