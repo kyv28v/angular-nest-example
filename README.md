@@ -10,18 +10,8 @@ DBはPostgreSQLを使用しています。
 ・npm           8.1.0  
 ・PostgreSql    12.1
 
-## インストール方法
- npm install で必要なモジュールをインストールします。  
+## DBの準備
  DBは、PostgreSqlを適当にインストールし、テスト用のテーブル、初期ユーザを作成してください。
-
-・DB設定（server/src/config/common.ts）
-```
-user = 'postgres';
-password = 'postgres';
-host = 'localhost';
-port = 5432;
-database = 'postgres';
-```
 
 ・テスト用のテーブル、初期ユーザ作成
 ```
@@ -30,7 +20,35 @@ database = 'postgres';
 # INSERT INTO users (name, password, note) VALUES ('admin', 'ba3253876aed6bc22d4a6ff53d8406c6ad864195ed144ab5c87621b6c233b548baeae6956df346ec8c17f5ea10f35ee3cbc514797ed7ddd3145464e2a0bab413', 'password:123456');
 ```
 
-## ビルド＆起動方法
+・接続設定  
+接続の設定は、以下のように環境変数をセットしてください。  
+（以下はwindowsの例です。）
+```
+setx DB_HOST localhost
+setx DB_NAME postgres
+setx DB_USER postgres
+setx DB_PASSWORD postgres
+setx DB_PORT 5432
+setx DB_SSL false
+```
+あるいは、apps\api\src\environments\environment.ts の以下の部分を書き換えることもできます。  
+（環境変数がセットされていない場合はこちらが使用されます。）
+```
+  pgConf: {
+    user: 'postgres',
+    password: 'postgres',
+    host: 'localhost',
+    port: 5432,
+    database: 'postgres',
+    ssl: false,
+  },
+```
+
+## 実行方法
+・npmパッケージのインストール
+```
+$ npm install
+```
 
 ・ビルド
 ```
@@ -67,4 +85,10 @@ heroku config:set DB_NAME=XXXXXXXXXX --app XXXXXXXXXXXX
 ・タイムゾーンの設定
 ```
 # alter database XXXXXXXXXX set timezone = 'Asia/Tokyo';
+```
+
+## renderでの実行
+ビルドコマンドは、以下のようにインストールとビルドを両方行うようにします。
+```
+$ npm install && npm run build
 ```
