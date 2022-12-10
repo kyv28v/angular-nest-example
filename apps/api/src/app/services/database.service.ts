@@ -10,6 +10,8 @@ const pool = new Pool({
   host: process.env.DB_HOST || environment.pgConf.host,
   port: process.env.DB_PORT || environment.pgConf.port,
   database: process.env.DB_NAME || environment.pgConf.database,
+  ssl: ((process.env.DB_SSL && process.env.DB_SSL.toLowerCase() == 'true') || environment.pgConf.ssl == true)
+    ? { rejectUnauthorized: false } : false,
 });
 
 @Injectable()

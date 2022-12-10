@@ -7,6 +7,7 @@ export const environment = {
     host: 'localhost',
     port: 5432,
     database: 'postgres',
+    ssl: false,
   },
   // アクセストークンの設定
   tokenConf: {
